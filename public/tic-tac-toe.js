@@ -28,21 +28,31 @@ function handleClick(e) {
     const block = e.target;
     let index = block.getAttribute("id");
 
+    if (gameActive == false) {
+        return;
+    }
+
     if (block.style.backgroundImage == "") {
         block.style.backgroundImage = currentPlayer;
         gameState[index] = currentPlayer;
-        playerChange();
     }
 
     checkWin();
     checkTie();
+    playerChange();
 };
 
 function checkWin() {
     winConditions.forEach(function (e) {
         let [a, b, c] = e;
         if (gameState[a] == gameState[b] && gameState[b] == gameState[c] && gameState[a] != "") {
-            console.log("winner");
+            gameActive = false;
+            if (currentPlayer == x) {
+                document.getElementById("winner").innerText = "Winner:X";
+            }
+            if (currentPlayer == o) {
+                document.getElementById("winner").innerText = "Winner:O";
+            }
         }
     })
 }
@@ -57,7 +67,7 @@ function checkTie() {
     })
     if (c === 9) {
         gameActive = false;
-        document.getElementById("winner").innerText = "Winner: None";
+        document.getElementById("winner").innerText = "Winner:None";
     }
 }
 
