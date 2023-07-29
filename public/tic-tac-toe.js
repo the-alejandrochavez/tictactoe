@@ -1,32 +1,64 @@
-const turn = document.querySelectorAll(".block");
+const board = document.querySelector(".board");
 const x = "url('images/player-x.svg')"
 const o = "url('images/player-o.svg')"
 let currentPlayer = x;
 let lastPlayer = o;
-let c = 0;
+let player;
+let gameActive = true;
+let gameState = ["", "", "", "", "", "", "", "", ""];
 
 const winConditions = [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9],
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
     [1, 4, 7],
     [2, 5, 8],
-    [3, 6, 9],
-    [1, 5, 9],
-    [3, 5, 7]
+    [0, 4, 8],
+    [2, 4, 6]
 ];
 
-turn.forEach(function (e) {
-    e.addEventListener("click", function () {
-        if (e.style.backgroundImage == '') {
-            if (currentPlayer != lastPlayer) {
-                e.style.backgroundImage = currentPlayer;
-            }
-            let changedPlayer = currentPlayer;
-            currentPlayer = lastPlayer;
-            lastPlayer = changedPlayer;
+function playerChange() {
+    player = currentPlayer;
+    currentPlayer = lastPlayer;
+    lastPlayer = player;
+}
+
+function handleClick(e) {
+    const block = e.target;
+    let index = block.getAttribute("id");
+
+    if (block.style.backgroundImage == "") {
+        block.style.backgroundImage = currentPlayer;
+        gameState[index] = currentPlayer;
+        playerChange();
+    }
+
+    checkWin();
+    checkTie();
+};
+
+function checkWin() {
+    winConditions.forEach(function (e) {
+        let [a, b, c] = e;
+        if (gameState[a] == gameState[b] && gameState[b] == gameState[c] && gameState[a] != "") {
+            console.log("winner");
+        }
+    })
+}
+
+function checkTie() {
+    let c = 0;
+
+    gameState.forEach(function (e) {
+        if (e != "") {
             c++;
         }
-        console.log(c);
-    });
-});
+    })
+    if (c === 9) {
+        gameActive = false;
+        document.getElementById("winner").innerText = "Winner: None";
+    }
+}
+
+board.addEventListener("click", handleClick);
