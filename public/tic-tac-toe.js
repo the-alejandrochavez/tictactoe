@@ -1,4 +1,7 @@
 const board = document.querySelector(".board");
+const newGame = document.getElementById("new-game");
+const giveUp = document.getElementById("give-up");
+const header = document.getElementById("winner");
 const x = "url('images/player-x.svg')"
 const o = "url('images/player-o.svg')"
 let currentPlayer = x;
@@ -6,6 +9,9 @@ let lastPlayer = o;
 let player;
 let gameActive = true;
 let gameState = ["", "", "", "", "", "", "", "", ""];
+
+newGame.disabled = true;
+giveUp.disabled = true;
 
 const winConditions = [
     [0, 1, 2],
@@ -32,6 +38,9 @@ function handleClick(e) {
         return;
     }
 
+    giveUp.disabled = false;
+
+
     if (block.style.backgroundImage == "") {
         block.style.backgroundImage = currentPlayer;
         gameState[index] = currentPlayer;
@@ -48,11 +57,13 @@ function checkWin() {
         if (gameState[a] == gameState[b] && gameState[b] == gameState[c] && gameState[a] != "") {
             gameActive = false;
             if (currentPlayer == x) {
-                document.getElementById("winner").innerText = "Winner:X";
+                header.innerText = "Winner:X";
             }
             if (currentPlayer == o) {
-                document.getElementById("winner").innerText = "Winner:O";
+                header.innerText = "Winner:O";
             }
+            newGame.disabled = false;
+            giveUp.disabled = true;
         }
     })
 }
@@ -67,8 +78,37 @@ function checkTie() {
     })
     if (c === 9) {
         gameActive = false;
-        document.getElementById("winner").innerText = "Winner:None";
+        header.innerText = "Winner:None";
+        newGame.disabled = false;
+        giveUp.disabled = true;
     }
 }
 
+function restartGame() {
+    gameActive = true;
+    gameState = ["", "", "", "", "", "", "", "", ""];
+    header.innerText = "";
+    const blocks = document.querySelectorAll(".block");
+    blocks.forEach(function (block) {
+        block.style.backgroundImage = "";
+    })
+    currentPlayer = x;
+    lastPlayer = o;
+    newGame.disabled = true;
+}
+
+function givingUp() {
+    if (currentPlayer == x) {
+        header.innerText = "Winner:O";
+    }
+    else {
+        header.innerText = "Winner:X";
+    }
+
+    giveUp.disabled = true;
+    newGame.disabled = false;
+}
+
 board.addEventListener("click", handleClick);
+newGame.addEventListener("click", restartGame);
+giveUp.addEventListener("click", givingUp);
