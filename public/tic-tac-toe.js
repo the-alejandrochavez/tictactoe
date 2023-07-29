@@ -105,6 +105,7 @@ function givingUp() {
         header.innerText = "Winner:X";
     }
 
+    gameActive = false;
     giveUp.disabled = true;
     newGame.disabled = false;
 }
