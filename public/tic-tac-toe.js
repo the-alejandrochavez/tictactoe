@@ -78,6 +78,10 @@ function checkWin() {
 function checkTie() {
     let c = 0;
 
+    if (gameActive == false) {
+        return;
+    }
+
     gameState.forEach(function (e) {
         if (e != "") {
             c++;
