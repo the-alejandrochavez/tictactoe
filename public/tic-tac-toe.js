@@ -13,6 +13,10 @@ let gameState = ["", "", "", "", "", "", "", "", ""];
 newGame.disabled = true;
 giveUp.disabled = true;
 
+gameState = loadState("saveState");
+currentPlayer = loadState("savePlayer");
+lastPlayer = loadState("saveLastPlayer");
+
 const winConditions = [
     [0, 1, 2],
     [3, 4, 5],
@@ -28,6 +32,8 @@ function playerChange() {
     player = currentPlayer;
     currentPlayer = lastPlayer;
     lastPlayer = player;
+    saveState("savePlayer", currentPlayer);
+    saveState("saveLastPlayer", lastPlayer);
 }
 
 function handleClick(e) {
@@ -44,11 +50,12 @@ function handleClick(e) {
     if (block.style.backgroundImage == "") {
         block.style.backgroundImage = currentPlayer;
         gameState[index] = currentPlayer;
+        saveState("saveState", gameState);
+        playerChange();
     }
 
     checkWin();
     checkTie();
-    playerChange();
 };
 
 function checkWin() {
@@ -57,10 +64,10 @@ function checkWin() {
         if (gameState[a] == gameState[b] && gameState[b] == gameState[c] && gameState[a] != "") {
             gameActive = false;
             if (currentPlayer == x) {
-                header.innerText = "Winner:X";
+                header.innerText = "Winner:O";
             }
             if (currentPlayer == o) {
-                header.innerText = "Winner:O";
+                header.innerText = "Winner:X";
             }
             newGame.disabled = false;
             giveUp.disabled = true;
@@ -95,6 +102,9 @@ function restartGame() {
     currentPlayer = x;
     lastPlayer = o;
     newGame.disabled = true;
+    saveState("saveState", gameState);
+    saveState("savePlayer", currentPlayer);
+    saveState("saveLastPlayer", lastPlayer);
 }
 
 function givingUp() {
@@ -108,6 +118,38 @@ function givingUp() {
     gameActive = false;
     giveUp.disabled = true;
     newGame.disabled = false;
+}
+
+function saveState(name, value) {
+    if (typeof value === "string") {
+        document.cookie = `${name}=${value};path=/`;
+    }
+    else {
+        document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};path=/`;
+    }
+}
+
+function loadState(name) {
+    let value = document.cookie.split("; ")
+        .find((row) => row.startsWith(name))
+        ?.split("=")[1];
+
+    if (typeof value === "string" && value[0] != "%") {
+        return value;
+    }
+    else {
+        value = JSON.parse(decodeURIComponent(value));
+        const blocks = document.querySelectorAll(".block");
+        blocks.forEach(function (block) {
+            let index = block.getAttribute("id")
+            block.style.backgroundImage = value[index];
+            if (value[index] != "") {
+                giveUp.disabled = false;
+            }
+        })
+    }
+
+    return value;
 }
 
 board.addEventListener("click", handleClick);
