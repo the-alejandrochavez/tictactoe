@@ -28,6 +28,14 @@ const winConditions = [
     [2, 4, 6]
 ];
 
+gameState.forEach(function (e) {
+    if (e != "") {
+        checkWin();
+        checkTie();
+        return;
+    }
+})
+
 function playerChange() {
     player = currentPlayer;
     currentPlayer = lastPlayer;
